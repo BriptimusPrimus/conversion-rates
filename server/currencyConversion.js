@@ -39,7 +39,7 @@ var _publicApi = "https://openexchangerates.org/",
 	_defaultStorage = "custom";
 
 //configurable variables
-var _sourceStorage = "custom"; // "localStorage"/"public"/"custom"
+var _sourceStorage = "custom", // "localStorage"/"public"/"custom"
 	_ratesMap; // will be used when _sourceStorage is "custom" or "default"
 
 function defaultValues(){
@@ -97,14 +97,43 @@ function resolveSource(){
 	return _defaultRatesMap;
 }
 
-function getConversionRate(from,to){
-	//TODO
+function computeConversionRate(convertFrom,convertTo){ 
+	var map = resolveSource(); 
+	var a = map[convertFrom] || map[_defaultRootRate];
+	var b = map[convertTo] || map[_defaultRootRate];
+	var result = (1/a.rate) * b.rate;
+	
+	//round to two decimals
+	result = Math.round(result * 100) / 100;
+	return result;
 }
 
-function convertCurrency(amount,from,to){
-	//TODO
+function convertCurrency(amount,convertFrom,convertTo){
+	if(!amount)
+		return 0;
+
+	var rate = computeConversionRate(convertFrom,convertTo);
+	var result = amount * rate;
+	
+	//round to two decimals
+	result = Math.round(result * 100) / 100;
+	return result;	
 }
 
 function getSymbols(){
-	//TODO
+	var result = {},
+		map = resolveSource();
+	for(code in map){
+		result[code] = map[code]["symbol"];
+	}
+
+	return result;
 }
+
+//API of Module 
+module.exports = {
+	setConfiguration: init,	
+	getConversionRate: computeConversionRate,
+	convertFromAtoB: convertCurrency,
+	getCurrencySymbols: getSymbols
+};
