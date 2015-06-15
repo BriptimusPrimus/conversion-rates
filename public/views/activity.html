@@ -1,0 +1,27 @@
+<div class="panel panel-default row">
+	<div class="col-xs-0 col-sm-1 col-md-2"></div>
+	<section class="col-xs-12 col-sm-10 col-md-8">
+		<h2 class="text-primary text-center">Transaction History</h2>
+		<div class="well">
+			<table class="table table-striped table-condensed table-bordered">
+				<thead>
+					<tr>
+						<th class="text-center">Date</th>
+						<th class="text-left">Transaction</th>
+						<th class="text-right">Amount</th>
+						<th class="text-center">Currency</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="item in data.transactions">
+						<td class="text-center">{{item.date}}</td>
+						<td class="text-left">{{item.type | capitalize}}: {{item.place}}</td>
+						<td class="text-right">{{item.amount | currency:currencySymbol(item.currencyCode)}}</td>
+						<td class="text-center">{{item.currencyCode}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</section>
+	<div class="col-xs-0 col-sm-1 col-md-2"></div>
+</div>

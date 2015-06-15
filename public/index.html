@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html ng-app="currencyConversionRates">
+<head>
+    <title>Paypal Conversion Rates</title>
+    <script src="angular.js"></script>
+    <link href="bootstrap.css" rel="stylesheet" />
+    <link href="bootstrap-theme.css" rel="stylesheet" />
+    <script>
+        angular.module("currencyConversionRates", ["customFilters", "ngRoute"])
+        .config(function ($routeProvider) {
+
+            $routeProvider.when("/activity", {
+                templateUrl: "views/activity.html"
+            });
+
+            $routeProvider.when("/currencyConversion", {
+                templateUrl: "views/currencyConversion.html"
+            });
+
+            $routeProvider.when("/conversionRate", {
+                templateUrl: "views/conversionRate.html"
+            });          
+ 
+            $routeProvider.otherwise({
+                templateUrl: "views/activity.html"
+            });
+        });
+    </script>
+    <script src="filters/customFilters.js"></script>
+    <script src="controllers/trasactionHistoryController.js"></script>
+    <script src="controllers/currencyConversionController.js"></script>
+    <script src="controllers/conversionRateController.js"></script>
+    <script src="ngmodules/angular-route.js"></script>
+</head>
+<body ng-controller="trasactionHistoryCtrl">
+    <div class="navbar navbar-inverse">
+        <a class="navbar-brand" href="#">Currency Conversion Rates</a>
+        <ul class="nav navbar-nav navbar-right">
+            <li><a href="#/activity">Transaction History</a></li>
+            <li><a href="#/currencyConversion">Currency Conversion</a></li>
+            <li><a href="#/conversionRate">Conversion Rates</a></li>
+        </ul>
+    </div>
+    <ng-view />
+</body>
+</html>
