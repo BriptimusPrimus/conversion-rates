@@ -12,19 +12,18 @@ app.get('/symbols', function(req,res){
     	"USD" : "$",
     	"EUR" : "\u20AC", //"&euro;", €
     	"CAD" : "$",
-    	"CNY" : "\u5143", //"\u00A5"=¥, // "元",
+    	"CNY" : "\u5143", // "元", //"\u00A5"=¥, 
     	"INR" : "\u20B9", //"₹" //&#8377;"
     	"MXN" : "$"
     }
 	res.json(symbolsMap);	
 });
 
-
-
-
-
-
-
+app.get('/paypal/conversionRate', function(req,res){
+    console.log("request to: "+req.url);
+    console.log("params: convertFrom="+req.query.convertFrom+"&convertTo="+req.query.convertTo);
+    res.json({conversionRate: 14.55});
+});
 
 
 
