@@ -3,26 +3,26 @@
 var express = require('express');
 var app = express();
 
+var curConv = require('./server/currencyConversion.js');
+curConv.setConfiguration({
+        source : "localStorage",
+        mock: true
+});
 
 //static files location
 app.use(express.static(__dirname + '/public'));
 
 app.get('/symbols', function(req,res){
-    var symbolsMap = {
-    	"USD" : "$",
-    	"EUR" : "\u20AC", //"&euro;", €
-    	"CAD" : "$",
-    	"CNY" : "\u5143", // "元", //"\u00A5"=¥, 
-    	"INR" : "\u20B9", //"₹" //&#8377;"
-    	"MXN" : "$"
-    }
+    var symbolsMap = curConv.getCurrencySymbols();
 	res.json(symbolsMap);	
 });
 
 app.get('/paypal/conversionRate', function(req,res){
     console.log("request to: "+req.url);
     console.log("params: convertFrom="+req.query.convertFrom+"&convertTo="+req.query.convertTo);
-    res.json({conversionRate: 14.55});
+    var result = curConv.getConversionRate(req.query.convertFrom,req.query.convertTo);
+    console.log("conversionRate:"+result);
+    res.json({conversionRate: result});
 });
 
 

@@ -1,6 +1,8 @@
 //constants
-var _publicApi = "https://openexchangerates.org/",
-	_localStorage = "rates.txt",
+var _publicApi = null,
+	_localStorage = null,
+	_storageMock = false;
+	_publicApiMock = false;
 	_defaultCurrencySymbol = "$",
 	_defaultRootCurrencyCode = "USD",
 	_defaultRootRate = 1,
@@ -40,16 +42,29 @@ var _publicApi = "https://openexchangerates.org/",
 
 //configurable variables
 var _sourceStorage = "custom", // "localStorage"/"public"/"custom"
-	_ratesMap; // will be used when _sourceStorage is "custom" or "default"
+	_ratesMap = {}; // will be used when _sourceStorage is "custom" or "default"
+
+//Factory which loads external modules
+var _factory = require('./currencyStorageFactory.js');	
+
+
+
+function loadDependencies(){
+	_localStorage = _factory.loadStorageModule(_storageMock);
+	_publicApi = _factory.loadProxyModule(_publicApiMock);	
+}
 
 function defaultValues(){
 	// custom means use local ratesMap object for currency conversion
 	_sourceStorage = _defaultStorage; 
 	_ratesMap = _defaultRatesMap;
+	_storageMock = false;
+	_publicApiMock = false;	
 }
 
 /* config = {
 // 	source : "localStorage"/"public"/"custom"/"default",
+//	mock: true/false
 // 	customRates : {
 // 		"USD" : { 
 // 			currencyCode : "USD",
@@ -80,27 +95,75 @@ function init(config){
 		_ratesMap = _defaultRatesMap;
 	}
 
-	if(!_ratesMap[_defaultRootCurrencyCode]){
+	if (!_ratesMap[_defaultRootCurrencyCode]){
 		_ratesMap[_defaultRootCurrencyCode] = {
 			currencyCode : _defaultRootCurrencyCode,
 			symbol : _defaultCurrencySymbol,
 			rate : _defaultRootRate			
 		}	
 	}
+
+	if (config.mock){
+		_storageMock = true;
+		_publicApiMock = true;		
+	}
+	else {
+		_storageMock = false;
+		_publicApiMock = false;		
+	}
+
+	loadDependencies();
+}
+
+function getRatesFromLocalStorage(){
+	if (!_localStorage){
+		_localStorage = _factory.loadStorageModule(_storageMock);
+	}
+	return _localStorage.getMap();
+}
+
+function getRatesFromPublicApi(){
+    if (!_publicApi){
+		_publicApi = _factory.loadProxyModule(_publicApiMock);    	
+    }
+    //this is needed because reading from the public API
+    // results in updating parts of the local storage
+	if (!_localStorage){
+		_localStorage = _factory.loadStorageModule(_storageMock);
+	}    
+
+	var map = _publicApi.getMap();
+	_localStorage.updateRates(map);
+
+	return map;
 }
 
 //must return a currencyRatesMap, acording to current configuration
 function resolveSource(){
-	//TODO
-
-	//mock functionality by returning default for now
-	return _defaultRatesMap;
+	// resolve acording to _sourceStorage
+	switch(_sourceStorage){
+		case "localStorage":
+			return getRatesFromLocalStorage();
+		case "public":
+			return getRatesFromPublicApi();
+		case "custom":
+			return _ratesMap;
+		default:
+			return _defaultRatesMap;
+	}
 }
 
 function computeConversionRate(convertFrom,convertTo){ 
 	var map = resolveSource(); 
-	var a = map[convertFrom] || map[_defaultRootRate];
-	var b = map[convertTo] || map[_defaultRootRate];
+	
+	var a = map[convertFrom] 
+		|| map[_defaultRootCurrencyCode] 
+		|| {rate : _defaultRootRate};
+	
+	var b = map[convertTo] 
+		|| map[_defaultRootCurrencyCode]
+		|| {rate : _defaultRootRate};
+
 	var result = (1/a.rate) * b.rate;
 	
 	//round to two decimals
