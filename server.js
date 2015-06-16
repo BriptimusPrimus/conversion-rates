@@ -14,7 +14,7 @@ app.use(express.static(__dirname + '/public'));
 
 app.get('/symbols', function(req,res){
     var symbolsMap = curConv.getCurrencySymbols();
-	res.json(symbolsMap);	
+	res.json(symbolsMap);
 });
 
 app.get('/paypal/conversionRate', function(req,res){

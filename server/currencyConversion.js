@@ -4,8 +4,8 @@ var _publicApi = null,
 	_storageMock = false;
 	_publicApiMock = false;
 	_defaultCurrencySymbol = "$",
-	_defaultRootCurrencyCode = "USD",
-	_defaultRootRate = 1,
+	_defaultBaseCurrencyCode = "USD",
+	_defaultBaseRate = 1,
 	_defaultRatesMap = {
 		"USD" : { 
 			currencyCode : "USD",
@@ -95,11 +95,11 @@ function init(config){
 		_ratesMap = _defaultRatesMap;
 	}
 
-	if (!_ratesMap[_defaultRootCurrencyCode]){
-		_ratesMap[_defaultRootCurrencyCode] = {
-			currencyCode : _defaultRootCurrencyCode,
+	if (!_ratesMap[_defaultBaseCurrencyCode]){
+		_ratesMap[_defaultBaseCurrencyCode] = {
+			currencyCode : _defaultBaseCurrencyCode,
 			symbol : _defaultCurrencySymbol,
-			rate : _defaultRootRate			
+			rate : _defaultBaseRate			
 		}	
 	}
 
@@ -157,12 +157,12 @@ function computeConversionRate(convertFrom,convertTo){
 	var map = resolveSource(); 
 	
 	var a = map[convertFrom] 
-		|| map[_defaultRootCurrencyCode] 
-		|| {rate : _defaultRootRate};
+		|| map[_defaultBaseCurrencyCode] 
+		|| {rate : _defaultBaseRate};
 	
 	var b = map[convertTo] 
-		|| map[_defaultRootCurrencyCode]
-		|| {rate : _defaultRootRate};
+		|| map[_defaultBaseCurrencyCode]
+		|| {rate : _defaultBaseRate};
 
 	var result = (1/a.rate) * b.rate;
 	
