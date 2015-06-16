@@ -51,36 +51,36 @@ useModuleApi();
 //add configuration
 var config = {
 	source : "localStorage",
-	mock: true
+	mock: false
 };
 console.log("add configuration ");
 console.log(config);
 curConv.setConfiguration(config);
 useModuleApi();
 
-//add configuration with custom map
-var config = {
-	source : "custom",
-	mock: true,
-	customRates : {
-		"USD" : { 
-			currencyCode : "USD",
-			symbol : "$",
-			rate : "1"
-		},
-		"EUR" : { 
-			currencyCode : "EUR",
-			symbol : "\u20AC", // €
-			rate : "0.75"
-		},
-		"CAD" : { 
-			currencyCode : "CAD",
-			symbol : "$",
-			rate : "1.1"
-		}
-	}	
-};
-console.log("add configuration ");
-console.log(config);
-curConv.setConfiguration(config);
-useModuleApi();
+// //add configuration with custom map
+// var config = {
+// 	source : "custom",
+// 	mock: true,
+// 	customRates : {
+// 		"USD" : { 
+// 			currencyCode : "USD",
+// 			symbol : "$",
+// 			rate : "1"
+// 		},
+// 		"EUR" : { 
+// 			currencyCode : "EUR",
+// 			symbol : "\u20AC", // €
+// 			rate : "0.75"
+// 		},
+// 		"CAD" : { 
+// 			currencyCode : "CAD",
+// 			symbol : "$",
+// 			rate : "1.1"
+// 		}
+// 	}	
+// };
+// console.log("add configuration ");
+// console.log(config);
+// curConv.setConfiguration(config);
+// useModuleApi();

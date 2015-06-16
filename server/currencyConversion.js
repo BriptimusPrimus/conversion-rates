@@ -29,7 +29,7 @@ var _publicApi = null,
 		},
 		"INR" : { 
 			currencyCode : "CNY",
-			symbol : "\u5143", //"₹"
+			symbol : "\u20B9", //"₹"
 			rate : "61.62"
 		},	
 		"MXN" : { 

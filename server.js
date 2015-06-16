@@ -6,7 +6,7 @@ var app = express();
 var curConv = require('./server/currencyConversion.js');
 curConv.setConfiguration({
         source : "localStorage",
-        mock: true
+        mock: false
 });
 
 //static files location
@@ -24,9 +24,6 @@ app.get('/paypal/conversionRate', function(req,res){
     console.log("conversionRate:"+result);
     res.json({conversionRate: result});
 });
-
-
-
 
 
 
