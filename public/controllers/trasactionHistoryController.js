@@ -16,6 +16,7 @@ angular.module("currencyConversionRates")
             });
 
         var symbolsMap = {};
+        $scope.data.currencyCodes = [];
         $http.get(symbolsUrl)
             .success(function(data){ 
                 symbolsMap = data;
@@ -29,7 +30,13 @@ angular.module("currencyConversionRates")
                     "CNY" : "\u5143",
                     "INR" : "\u20B9" 
                 };
-            });           
+            })
+            .finally(function() {
+                for(code in symbolsMap){
+                    $scope.data.currencyCodes.push(code);    
+                }      
+                console.log($scope.data.currencyCodes);
+            });
 
 
         $scope.currencySymbol = function (code) {

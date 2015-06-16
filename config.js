@@ -1,4 +1,4 @@
-var source = "public" //"localStorage",
+var source = "localStorage" //"localStorage"/"public"/"custom"/"default"
 	mock = false;
 
 module.exports = {

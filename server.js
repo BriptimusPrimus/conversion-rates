@@ -47,8 +47,8 @@ app.get('/paypal/currencyConversion', function(req, res){
             if(err)
                 return res.status(500).end();
 
-            console.log("converted value: "+result);
-            res.json({convertedValue: result});
+            console.log(result);
+            res.json(result);
         });   
 })
 

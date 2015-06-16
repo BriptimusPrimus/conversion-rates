@@ -11,14 +11,16 @@ function parseArrayToRatesMap(arr){
 	var result = {};
 	var code, sym, val;
 	for(k in arr){
-		code = arr[k].slice(0,3); // "USD"
-		sym = arr[k].slice(4,5); // "$"
-		val = arr[k].slice(6); // 1.00
-		val = Math.round(parseFloat(val) * 100) / 100;
-		result[code] = { 
-			currencyCode : code,
-			symbol : sym,
-			rate : val						
+		if(arr[k].trim()){ //string in index might be empty
+			code = arr[k].slice(0,3); // "USD"
+			sym = arr[k].slice(4,5); // "$"
+			val = arr[k].slice(6); // 1.00
+			val = Math.round(parseFloat(val) * 100) / 100;
+			result[code] = { 
+				currencyCode : code,
+				symbol : sym,
+				rate : val						
+			}
 		}
 	}
 	return result;	
@@ -69,7 +71,7 @@ function updateConversionRates(updates){
 	readConversionRates(function(err, map){
 		//merge map with new fresh data (updates)
 		for(code in updates){
-			map[code] || {};
+			map[code] = map[code] || {};
 			map[code].code = code;
 			map[code].symbol = updates[code].symbol || map[code].symbol || "$";
 			map[code].rate = updates[code].rate;

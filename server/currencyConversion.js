@@ -40,7 +40,8 @@ var _publicApi = null,
 			rate : "10"
 		},					
 	},
-	_defaultStorage = "custom";
+	_defaultStorage = "custom",
+	_cahedSymbols = null;
 
 //configurable variables
 var _sourceStorage = "custom", // "localStorage"/"public"/"custom"
@@ -195,16 +196,30 @@ function convertCurrency(amount, convertFrom, convertTo, callback){
 		if(err)
 			return callback(err);
 
-		var result = amount * rate;
+		var converted = amount * rate;
 		
 		//round to two decimals
-		result = Math.round(result * 100) / 100;
-		callback(null, result);
+		converted = Math.round(converted * 100) / 100;
+
+		//get the symbols
+		getSymbols(function(err, symbols){
+			var result = {
+				convertedValue: converted,
+				currencyCode: convertFrom,
+				symbol: symbols[convertFrom] || _defaultCurrencySymbol
+			};
+			callback(null, result);
+		});		
 	});
 }
 
 function getSymbols(callback){
 	//symbols are only in the file (no public api)
+
+	if(_cahedSymbols){
+		return callback(null, _cahedSymbols);
+	}
+
 	getRatesFromLocalStorage(function(err, map){
 		if(err)
 			return callback(err);
@@ -213,6 +228,7 @@ function getSymbols(callback){
 		for(code in map){
 			result[code] = map[code]["symbol"] || _defaultCurrencySymbol;
 		}
+		_cahedSymbols = result;
 		callback(null, result);
 	});
 }
