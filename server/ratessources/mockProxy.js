@@ -1,6 +1,6 @@
 //implements the interface:
 // IPublicApiProxy:
-// 	function getMap()
+// 	function getMap(convertFrom, convertTo, callback)
 
 var ratesMap = {
 		"USD" : { 
@@ -35,8 +35,8 @@ var ratesMap = {
 		},					
 	}
 
-function staticRatesMap(){
-	return ratesMap;
+function staticRatesMap(convertFrom, convertTo, callback){
+	callback(null, ratesMap);
 }
 
 module.exports = {

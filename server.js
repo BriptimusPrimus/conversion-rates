@@ -3,26 +3,36 @@
 var express = require('express');
 var app = express();
 
+var config = require('./config.js');
 var curConv = require('./server/currencyConversion.js');
 curConv.setConfiguration({
-        source : "localStorage",
-        mock: false
+        source : config.source,
+        mock: config.mock
 });
 
 //static files location
 app.use(express.static(__dirname + '/public'));
 
 app.get('/symbols', function(req,res){
-    var symbolsMap = curConv.getCurrencySymbols();
-	res.json(symbolsMap);
+    curConv.getCurrencySymbols(function(err, symbolsMap){
+        if(err) 
+            return res.status(500).end();
+
+        console.log(symbolsMap);
+        res.json(symbolsMap);
+    })
 });
 
 app.get('/paypal/conversionRate', function(req,res){
     console.log("request to: "+req.url);
     console.log("params: convertFrom="+req.query.convertFrom+"&convertTo="+req.query.convertTo);
-    var result = curConv.getConversionRate(req.query.convertFrom,req.query.convertTo);
-    console.log("conversionRate:"+result);
-    res.json({conversionRate: result});
+    curConv.getConversionRate(req.query.convertFrom, req.query.convertTo, function(err, result){
+        if(err) 
+            return res.status(500).end();
+
+        console.log("conversionRate:"+result);
+        res.json({conversionRate: result});
+    });
 });
 
 

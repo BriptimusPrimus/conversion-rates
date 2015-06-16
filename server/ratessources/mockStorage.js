@@ -1,6 +1,6 @@
 // implements the interface:
 // IStorage:
-// 	function getMap()
+// 	function getMap(callback)
 // 	function updateRates(updates)
 
 var ratesMap = {
@@ -36,8 +36,8 @@ var ratesMap = {
 		},					
 	}
 
-function staticRatesMap(){
-	return ratesMap;
+function staticRatesMap(callback){
+	callback(null, ratesMap);
 }
 
 function mockUpdate(updates){

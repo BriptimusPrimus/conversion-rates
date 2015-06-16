@@ -115,14 +115,20 @@ function init(config){
 	loadDependencies();
 }
 
-function getRatesFromLocalStorage(){
+function getRatesFromLocalStorage(callback){
 	if (!_localStorage){
 		_localStorage = _factory.loadStorageModule(_storageMock);
 	}
-	return _localStorage.getMap();
+	_localStorage.getMap(function(err, result){
+		if(err)
+			return callback(err);
+
+		callback(null, result);
+	});
 }
 
-function getRatesFromPublicApi(){
+// TODO callbacks
+function getRatesFromPublicApi(convertFrom, convertTo, callback){
     if (!_publicApi){
 		_publicApi = _factory.loadProxyModule(_publicApiMock);    	
     }
@@ -132,65 +138,79 @@ function getRatesFromPublicApi(){
 		_localStorage = _factory.loadStorageModule(_storageMock);
 	}    
 
-	var map = _publicApi.getMap();
-	_localStorage.updateRates(map);
+	_publicApi.getMap(convertFrom, convertTo, function(err, map){
+		if(err)
+			return callback(err);
 
-	return map;
+		_localStorage.updateRates(map);
+		callback(null, map);
+	});
 }
 
 //must return a currencyRatesMap, acording to current configuration
-function resolveSource(){
+function resolveSource(convertFrom, convertTo, callback){
 	// resolve acording to _sourceStorage
 	switch(_sourceStorage){
 		case "localStorage":
-			return getRatesFromLocalStorage();
+			getRatesFromLocalStorage(callback);
+			break;
 		case "public":
-			return getRatesFromPublicApi();
+			getRatesFromPublicApi(convertFrom, convertTo, callback);
+			break;
 		case "custom":
-			return _ratesMap;
+			callback(_ratesMap);
+			break;
 		default:
-			return _defaultRatesMap;
+			callback(_defaultRatesMap);
 	}
 }
 
-function computeConversionRate(convertFrom,convertTo){ 
-	var map = resolveSource(); 
-	
-	var a = map[convertFrom] 
-		|| map[_defaultBaseCurrencyCode] 
-		|| {rate : _defaultBaseRate};
-	
-	var b = map[convertTo] 
-		|| map[_defaultBaseCurrencyCode]
-		|| {rate : _defaultBaseRate};
+function computeConversionRate(convertFrom, convertTo, callback){ 
+	resolveSource(convertFrom, convertTo, function(err, map){
+		if(err)
+			return callback(err);
 
-	var result = (1/a.rate) * b.rate;
-	
-	//round to two decimals
-	result = Math.round(result * 100) / 100;
-	return result;
+		var a = map[convertFrom] 
+			|| map[_defaultBaseCurrencyCode] 
+			|| {rate : _defaultBaseRate};
+		
+		var b = map[convertTo] 
+			|| map[_defaultBaseCurrencyCode]
+			|| {rate : _defaultBaseRate};
+
+		var result = (1/a.rate) * b.rate;
+		
+		//round to two decimals
+		result = Math.round(result * 100) / 100;
+		callback(null, result);
+	}); 	
 }
 
-function convertCurrency(amount,convertFrom,convertTo){
+function convertCurrency(amount, convertFrom, convertTo, callback){
 	if(!amount)
-		return 0;
+		return callback(null, 0);
 
-	var rate = computeConversionRate(convertFrom,convertTo);
-	var result = amount * rate;
-	
-	//round to two decimals
-	result = Math.round(result * 100) / 100;
-	return result;	
+	computeConversionRate(convertFrom, convertTo, function(err, rate){
+		var result = amount * rate;
+		
+		//round to two decimals
+		result = Math.round(result * 100) / 100;
+		callback(null, result);
+	});
 }
 
-function getSymbols(){
-	var result = {},
-		map = resolveSource();
-	for(code in map){
-		result[code] = map[code]["symbol"];
-	}
+function getSymbols(callback){
+	//symbols are only in the file
+	getRatesFromLocalStorage(function(err, map){
+		if(err)
+			return callback(err);
 
-	return result;
+		var result = {};
+		for(code in map){
+			result[code] = map[code]["symbol"] || _defaultCurrencySymbol;
+		}
+		callback(null, result);
+	});
 }
 
 //API of Module 
