@@ -11,9 +11,9 @@ function parseArrayToRatesMap(arr){
 	var result = {};
 	var code, sym, val;
 	for(k in arr){
-		code = arr[k].slice(0,3); 
-		sym = arr[k].slice(4,5); 
-		val = arr[k].slice(6); 
+		code = arr[k].slice(0,3); // "USD"
+		sym = arr[k].slice(4,5); // "$"
+		val = arr[k].slice(6); // 1.00
 		val = Math.round(parseFloat(val) * 100) / 100;
 		result[code] = { 
 			currencyCode : code,
@@ -26,12 +26,14 @@ function parseArrayToRatesMap(arr){
 
 function parseRateMapToStr(map){
 	var str = "";
-	for(code in map){		
+	for(code in map){
+		//add a line		
 		str += code+"="+map[code].symbol+" "+map[code].rate.toFixed(2)+"\n"
 	}
 	return str;
 }
 
+//write to file
 function writeContent(content, callback) {
     fs.writeFile(_path, content, function (err) {
         if (err) 
@@ -40,6 +42,7 @@ function writeContent(content, callback) {
     })
 }
 
+//read from file
 function readContent(callback) {
     fs.readFile(_path, "utf-8", function (err, content) {
         if (err) 
@@ -55,6 +58,7 @@ function readConversionRates(callback){
 			callback(err);			
 		}
 
+		//split lines into an array
 		var arr = content.trim().split('\n');
 		var result = parseArrayToRatesMap(arr);
 		callback(null, result);		

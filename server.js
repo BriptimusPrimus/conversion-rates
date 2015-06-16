@@ -13,7 +13,9 @@ curConv.setConfiguration({
 //static files location
 app.use(express.static(__dirname + '/public'));
 
-app.get('/symbols', function(req,res){
+// /symbols
+app.get('/symbols', function(req, res){
+    console.log("request to: "+req.url);
     curConv.getCurrencySymbols(function(err, symbolsMap){
         if(err) 
             return res.status(500).end();
@@ -23,7 +25,8 @@ app.get('/symbols', function(req,res){
     })
 });
 
-app.get('/paypal/conversionRate', function(req,res){
+// /paypal/conversionRate?convertFrom=EUR&convertTo=CAD
+app.get('/paypal/conversionRate', function(req, res){
     console.log("request to: "+req.url);
     console.log("params: convertFrom="+req.query.convertFrom+"&convertTo="+req.query.convertTo);
     curConv.getConversionRate(req.query.convertFrom, req.query.convertTo, function(err, result){
@@ -35,11 +38,19 @@ app.get('/paypal/conversionRate', function(req,res){
     });
 });
 
+// /paypal/currencyConversion?amount=100&convertFrom=USD&convertTo=EUR
+app.get('/paypal/currencyConversion', function(req, res){
+    console.log("request to: "+req.url);
 
+    curConv.convertFromAtoB(req.query.amount, req.query.convertFrom, 
+        req.query.convertTo, function(err, result){
+            if(err)
+                return res.status(500).end();
 
-
-
-
+            console.log("converted value: "+result);
+            res.json({convertedValue: result});
+        });   
+})
 
 
 app.listen(3000, function(){

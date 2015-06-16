@@ -16,13 +16,13 @@ angular.module("currencyConversionRates")
 	        $http.get(ratesUrl, {
 	        	params : params
 	        })
-	            .success(function (data) {
-	                $scope.model.rate = data.conversionRate;
-	            })
-	            .error(function (error) {
-	                $scope.model.error = error || { status : 404 };
-	                $scope.model.rate = "Unable to find conversion rate";
-	            });			
+            .success(function (data) {
+                $scope.model.rate = data.conversionRate;
+            })
+            .error(function (error) {
+                $scope.model.error = error || { status : 404 };
+                $scope.model.rate = "Unable to find conversion rate";
+            });			
 		}
 
 	});

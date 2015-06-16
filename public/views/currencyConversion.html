@@ -7,38 +7,41 @@
 
 		        <div class="form-group">
 		            <label for="amount" class="control-label"> Amount to convert: </label>
-		            <input type="number" name="amount" class="form-control" required />           
+		            <input type="number" name="amount" class="form-control" ng-model="model.amount" required />
 		        </div>				
 
 		        <div class="form-group">
 		            <label for="from" class="control-label"> Convert from: </label>
-		            <select name="from" class="form-control" required>
-		                <option>USD {{currencySymbol('USD')}}</option>
-		                <option>EUR {{currencySymbol('EUR')}}</option>
-		                <option>CAD {{currencySymbol('CAD')}}</option>
-		                <option>CNY {{currencySymbol('CNY')}}</option>
-		                <option>INR {{currencySymbol('INR')}}</option>
+		            <select name="from" class="form-control" ng-model="model.convertFrom" required>
+		                <option value={{'USD'}}>USD {{currencySymbol('USD')}}</option>
+		                <option value={{'EUR'}}>EUR {{currencySymbol('EUR')}}</option>
+		                <option value={{'CAD'}}>CAD {{currencySymbol('CAD')}}</option>
+		                <option value={{'CNY'}}>CNY {{currencySymbol('CNY')}}</option>
+		                <option value={{'INR'}}>INR {{currencySymbol('INR')}}</option>
+		                <option value={{'MXN'}}>MXN {{currencySymbol('MXN')}}</option>
 		            </select>
 		        </div>
 
 		        <div class="form-group">
 		            <label for="to" class="control-label"> Convert to: </label>
-		            <select name="to" class="form-control" required>
-		                <option>USD {{currencySymbol('USD')}}</option>
-		                <option>EUR {{currencySymbol('EUR')}}</option>
-		                <option>CAD {{currencySymbol('CAD')}}</option>
-		                <option>CNY {{currencySymbol('CNY')}}</option>
-		                <option>INR {{currencySymbol('INR')}}</option>
+		            <select name="to" class="form-control" ng-model="model.convertTo" required>
+		                <option value={{'USD'}}>USD {{currencySymbol('USD')}}</option>
+		                <option value={{'EUR'}}>EUR {{currencySymbol('EUR')}}</option>
+		                <option value={{'CAD'}}>CAD {{currencySymbol('CAD')}}</option>
+		                <option value={{'CNY'}}>CNY {{currencySymbol('CNY')}}</option>
+		                <option value={{'INR'}}>INR {{currencySymbol('INR')}}</option>
+		                <option value={{'MXN'}}>MXN {{currencySymbol('MXN')}}</option>
 		            </select>
 		        </div>		        
 
-		        <button class="btn btn-primary">Convert</button>		        
+		        <button class="btn btn-primary" ng-click="convertCurrency()">Convert</button>
+
 			</form>
 			<hr>
 			<form class="form-inline" novalidate>
 		        <div class="form-group">
 		            <label for="" class="control-label">Converted Value</label>
-		            <input type="text" name="result" class="form-control" readonly="readonly" />
+		            <input type="text" name="result" class="form-control" ng-model="model.convertedVal" readonly="readonly" />
 		        </div>				
 			</form>			
 		</div>

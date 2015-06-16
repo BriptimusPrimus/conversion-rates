@@ -29,15 +29,12 @@ angular.module("currencyConversionRates")
                     "CNY" : "\u5143",
                     "INR" : "\u20B9" 
                 };
-            })           
+            });           
 
-        //this mapping objects should be provided by the server
-		
 
         $scope.currencySymbol = function (code) {
         	var result = "$" //default value
         	result = symbolsMap[code] || result;
-        	//console.log(code+":"+result);
         	return result;
         }		
 

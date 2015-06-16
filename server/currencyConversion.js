@@ -1,3 +1,5 @@
+//Core Currency Converion Module
+
 //constants
 var _publicApi = null,
 	_localStorage = null,
@@ -46,7 +48,6 @@ var _sourceStorage = "custom", // "localStorage"/"public"/"custom"
 
 //Factory which loads external modules
 var _factory = require('./currencyStorageFactory.js');	
-
 
 
 function loadDependencies(){
@@ -127,7 +128,6 @@ function getRatesFromLocalStorage(callback){
 	});
 }
 
-// TODO callbacks
 function getRatesFromPublicApi(convertFrom, convertTo, callback){
     if (!_publicApi){
 		_publicApi = _factory.loadProxyModule(_publicApiMock);    	
@@ -190,7 +190,11 @@ function convertCurrency(amount, convertFrom, convertTo, callback){
 	if(!amount)
 		return callback(null, 0);
 
+	//get the conversion rate in order to convert
 	computeConversionRate(convertFrom, convertTo, function(err, rate){
+		if(err)
+			return callback(err);
+
 		var result = amount * rate;
 		
 		//round to two decimals
@@ -200,7 +204,7 @@ function convertCurrency(amount, convertFrom, convertTo, callback){
 }
 
 function getSymbols(callback){
-	//symbols are only in the file
+	//symbols are only in the file (no public api)
 	getRatesFromLocalStorage(function(err, map){
 		if(err)
 			return callback(err);

@@ -9,22 +9,25 @@
 // NOTE: Better use an external module like request
 // https://www.npmjs.com/package/request
 var http = require('http');
+var host = 'openexchangerates.org',
+	path = '/api/latest.json?app_id=8acbe931c9834a6d9a983165fe4b61f1';
+
 
 function getDataFromService(currency1, currency2, callback){
 
-	console.log("request to: openexchangerates.org/api/latest.json?app_id=8acbe931c9834a6d9a983165fe4b61f1");
+	console.log("request to: "+host+path);
     return http.get({
-        host: 'openexchangerates.org',
-        path: '/api/latest.json?app_id=8acbe931c9834a6d9a983165fe4b61f1'
+        host: host,
+        path: path
     }, function(response) {
         // Continuously update stream with data
-        var body = '';
+        var buf = '';
         response.on('data', function(d) {
-            body += d;
+            buf += d;
         });
         response.on('end', function() {
             // Data reception is done
-            var parsed = JSON.parse(body);
+            var parsed = JSON.parse(buf);
             var rates = parsed.rates;            
 			var rate1 = rates[currency1] || "1",
 				rate2 = rates[currency2] || "1";
