@@ -24,7 +24,7 @@ angular.module("currencyConversionRates")
             })
             .error(function (error) {
                 $scope.model.error = error || { status : 404 };
-                $scope.model.rate = "Unable to find conversion rate";
+                $scope.model.convertedVal = "Unable to find conversion rate";
             });        						
 
 		}

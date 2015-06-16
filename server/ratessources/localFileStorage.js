@@ -4,8 +4,10 @@
 // 	function updateRates(updates)
 
 //path relative to server.js
-var _path = "./server/ratessources/rates.txt";
 var fs = require('fs');
+var config = require('../../config.js');
+var _path = config.ratesFilePath; 
+console.log("storage file path: "+_path);
 
 function parseArrayToRatesMap(arr){
 	var result = {};

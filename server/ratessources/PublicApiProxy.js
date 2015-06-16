@@ -9,16 +9,14 @@
 // NOTE: Better use an external module like request
 // https://www.npmjs.com/package/request
 var http = require('http');
-var host = 'openexchangerates.org',
-	path = '/api/latest.json?app_id=8acbe931c9834a6d9a983165fe4b61f1';
-
+var config = require('../../config.js');
 
 function getDataFromService(currency1, currency2, callback){
 
-	console.log("request to: "+host+path);
+	console.log("request to: "+config.publicApi.host+config.publicApi.path);
     return http.get({
-        host: host,
-        path: path
+        host: config.publicApi.host,
+        path: config.publicApi.path
     }, function(response) {
         // Continuously update stream with data
         var buf = '';
