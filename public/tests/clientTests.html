@@ -17,10 +17,10 @@
 <script src="../controllers/currencyConversionController.js"></script>
 
 <script type="text/javascript">
-describe("trasactionHistory Controller Test", function(){
+describe("trasactionHistory Controller Tests", function(){
 	
 	//Arrange
-	var mockScope, controller, backend, getDataUrl, getSymbolsUrl;
+	var mockScope, controller, backend;
 
 	beforeEach(angular.mock.module("currencyConversionRates"));
 
@@ -44,10 +44,8 @@ describe("trasactionHistory Controller Test", function(){
         });        
     }));
 
-	beforeEach(angular.mock.inject(function($controller, $rootScope, $http, dataUrl, symbolsUrl){
+	beforeEach(angular.mock.inject(function($controller, $rootScope, $http){
 		mockScope = $rootScope.$new();
-		getDataUrl = dataUrl;
-		getSymbolsUrl = symbolsUrl;
 		controller = $controller("trasactionHistoryCtrl", {
 			$scope: mockScope,
 			$http: $http
@@ -84,6 +82,135 @@ describe("trasactionHistory Controller Test", function(){
 		expect(mockScope.currencySymbol("INR")).toEqual("\u20B9");
 		expect(mockScope.currencySymbol("GBP")).toEqual("$");
 	});
+});
+
+describe("conversionRates Controller Tests", function(){
+
+	//Arrange
+	var mockScope, controller, backend;
+
+	beforeEach(angular.mock.module("currencyConversionRates"));
+
+    beforeEach(angular.mock.inject(function ($httpBackend) {
+        backend = $httpBackend;        
+    }));
+
+	beforeEach(angular.mock.inject(function($controller, $rootScope, $http){
+		mockScope = $rootScope.$new();
+		controller = $controller("conversionRateCtrl", {
+			$scope: mockScope,
+			$http: $http
+		});		
+	})); 
+
+	//Act and Assess
+	it("Initializes model", function(){
+		expect(mockScope.model).toBeDefined();
+		expect(mockScope.model.rate).toEqual(0);
+	});
+
+	it("Gets conversion rate from the server", function(){
+        backend.expect("GET", "/paypal/conversionRate?convertFrom=USD&convertTo=CNY")
+        .respond({conversionRate: 5});		
+		mockScope.model.convertFrom = "USD";
+		mockScope.model.convertTo = "CNY";		
+		mockScope.getConversionRate();
+		backend.flush();		
+		expect(mockScope.model.rate).toEqual(5);	
+	});
+
+	it("Sets no error when receiving conversion rate", function(){
+        backend.expect("GET", "/paypal/conversionRate?convertFrom=EUR&convertTo=MXN")
+        .respond({conversionRate: 20});
+		mockScope.model.convertFrom = "EUR";
+		mockScope.model.convertTo = "MXN";		
+		mockScope.getConversionRate();
+		backend.flush();
+		expect(mockScope.model.error).toBeUndefined();
+		expect(mockScope.model.rate).toEqual(20);        		
+	});
+
+	it("Identifies error on server error respond", function(){
+        backend.expect("GET", "/paypal/conversionRate?convertFrom=USD&convertTo=EUR")
+        .respond(500, {status : 500, message : "server error"});
+		mockScope.model.convertFrom = "USD";
+		mockScope.model.convertTo = "EUR";		
+		mockScope.getConversionRate();
+		backend.flush();
+		expect(mockScope.model.rate).toEqual("Unable to find conversion rate");
+		expect(mockScope.model.error.status).toEqual(500);
+	});	      	
+});
+
+describe("currencyConversion Controller Tests", function(){
+
+	//Arrange
+	var mockScope, controller, backend;
+
+	beforeEach(angular.mock.module("currencyConversionRates"));
+
+    beforeEach(angular.mock.inject(function ($httpBackend) {
+        backend = $httpBackend;        
+    }));
+
+	beforeEach(angular.mock.inject(function($controller, $rootScope, $http){
+		mockScope = $rootScope.$new();
+		controller = $controller("currencyConversionCtrl", {
+			$scope: mockScope,
+			$http: $http
+		});		
+	})); 
+
+	//Act and Assess
+	it("Initializes model", function(){
+		expect(mockScope.model).toBeDefined();
+		expect(mockScope.model.convertedVal).toEqual(0);
+		expect(mockScope.model.amount).toEqual(1);
+	});
+
+	it("Gets converted currency data from the server", function(){
+        backend.expect("GET", "/paypal/currencyConversion?amount=10&convertFrom=USD&convertTo=CNY")
+        .respond({        	
+        	"convertedValue":50,
+        	"currencyCode":"CNY",
+        	"symbol":"元"
+        });
+        mockScope.model.amount = 10;
+		mockScope.model.convertFrom = "USD";
+		mockScope.model.convertTo = "CNY";		
+		mockScope.convertCurrency();
+		backend.flush();		
+		expect(mockScope.model.convertedVal).toEqual(50);	
+	});
+
+	it("Sets no error when receiving conversion rate", function(){
+        backend.expect("GET", "/paypal/currencyConversion?amount=10&convertFrom=EUR&convertTo=MXN")
+        .respond({        	
+        	"convertedValue":200,
+        	"currencyCode":"MXN",
+        	"symbol":"$"
+        });
+        mockScope.model.amount = 10;
+		mockScope.model.convertFrom = "EUR";
+		mockScope.model.convertTo = "MXN";		
+		mockScope.convertCurrency();
+		backend.flush();
+		expect(mockScope.model.error).toBeUndefined();
+		expect(mockScope.model.convertedVal).toEqual(200);        		
+	});	
+
+	it("Identifies error on server error respond", function(){
+        backend.expect("GET", "/paypal/currencyConversion?amount=10&convertFrom=USD&convertTo=EUR")
+        .respond(500, {status : 500, message : "server error"});
+		mockScope.model.amount = 10;
+		mockScope.model.convertFrom = "USD";
+		mockScope.model.convertTo = "EUR";		
+		mockScope.convertCurrency();
+		backend.flush();
+		expect(mockScope.model.convertedVal).toEqual("Unable to find conversion rate");
+		expect(mockScope.model.error.status).toEqual(500);
+	});		
+      	
 });
 
 </script>
