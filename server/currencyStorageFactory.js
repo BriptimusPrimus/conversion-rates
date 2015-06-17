@@ -17,7 +17,6 @@ function loadStorageModule(mock){
 	// IPublicApiProxy:
 	// 	function getMap()
 function loadProxyModule(mock){
-	//TODO
 	if(mock){
 		return require('./ratessources/mockProxy.js');
 	}
