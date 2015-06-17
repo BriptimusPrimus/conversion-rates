@@ -28,14 +28,14 @@ app.get('/symbols', function(req, res){
 // /paypal/conversionRate?convertFrom=EUR&convertTo=CAD
 app.get('/paypal/conversionRate', function(req, res){
     console.log("request to: "+req.url);
-    console.log("params: convertFrom="+req.query.convertFrom+"&convertTo="+req.query.convertTo);
-    curConv.getConversionRate(req.query.convertFrom, req.query.convertTo, function(err, result){
-        if(err) 
-            return res.status(500).end();
+    curConv.getConversionRate(req.query.convertFrom, req.query.convertTo, 
+        function(err, result){
+            if(err) 
+                return res.status(500).end();
 
-        console.log("conversionRate:"+result);
-        res.json({conversionRate: result});
-    });
+            console.log("conversionRate:"+result);
+            res.json({conversionRate: result});
+        });
 });
 
 // /paypal/currencyConversion?amount=100&convertFrom=USD&convertTo=EUR

@@ -30,7 +30,7 @@ var _publicApi = null,
 			rate : "6.05"
 		},
 		"INR" : { 
-			currencyCode : "CNY",
+			currencyCode : "INR",
 			symbol : "\u20B9", //"₹"
 			rate : "61.62"
 		},	
@@ -144,6 +144,8 @@ function getRatesFromPublicApi(convertFrom, convertTo, callback){
 			return callback(err);
 
 		_localStorage.updateRates(map);
+		//empty cache after updating the local storage
+		_cahedSymbols = null;
 		callback(null, map);
 	});
 }
@@ -159,7 +161,7 @@ function resolveSource(convertFrom, convertTo, callback){
 			getRatesFromPublicApi(convertFrom, convertTo, callback);
 			break;
 		case "custom":
-			callback(_ratesMap);
+			callback(null, _ratesMap);
 			break;
 		default:
 			callback(_defaultRatesMap);
@@ -188,7 +190,7 @@ function computeConversionRate(convertFrom, convertTo, callback){
 }
 
 function convertCurrency(amount, convertFrom, convertTo, callback){
-	if(!amount)
+	if(amount === 0)
 		return callback(null, 0);
 
 	//get the conversion rate in order to convert
@@ -205,8 +207,8 @@ function convertCurrency(amount, convertFrom, convertTo, callback){
 		getSymbols(function(err, symbols){
 			var result = {
 				convertedValue: converted,
-				currencyCode: convertFrom,
-				symbol: symbols[convertFrom] || _defaultCurrencySymbol
+				currencyCode: convertTo,
+				symbol: symbols[convertTo] || _defaultCurrencySymbol
 			};
 			callback(null, result);
 		});		
@@ -218,6 +220,16 @@ function getSymbols(callback){
 
 	if(_cahedSymbols){
 		return callback(null, _cahedSymbols);
+	}
+
+	//if custom or default avoid looking for the map
+	if(_sourceStorage === _defaultStorage){
+		var result = {};
+		for(code in _ratesMap){
+			result[code] = _ratesMap[code]["symbol"] || _defaultCurrencySymbol;
+		}		
+		_cahedSymbols = result;
+		return callback(null, result);		
 	}
 
 	getRatesFromLocalStorage(function(err, map){
