@@ -191,6 +191,6 @@ function testLFileStorage(){
 
 testCurrencyConversion();
 testLFileStorage();
-testPublicProxyApi();
+// testPublicProxyApi();
 
 
