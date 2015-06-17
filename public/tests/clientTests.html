@@ -209,8 +209,28 @@ describe("currencyConversion Controller Tests", function(){
 		backend.flush();
 		expect(mockScope.model.convertedVal).toEqual("Unable to find conversion rate");
 		expect(mockScope.model.error.status).toEqual(500);
-	});		
-      	
+	});		      	
+});
+
+describe("Capitalize Filter Tests", function () {
+ 
+    var filterInstance;
+ 
+    beforeEach(angular.mock.module("customFilters"));
+ 
+    beforeEach(angular.mock.inject(function ($filter) {
+        filterInstance = $filter("capitalize");
+    }));
+ 
+    it("Capitalizes a lower case frase", function () {
+        var result = filterInstance("test phrase");
+        expect(result).toEqual("Test phrase");
+    });
+ 
+    it("Capitalizes only first letter in an upper cased frase", function () {
+        var result = filterInstance("TEST PHRASE", true);
+        expect(result).toEqual("Test phrase");
+    });
 });
 
 </script>
