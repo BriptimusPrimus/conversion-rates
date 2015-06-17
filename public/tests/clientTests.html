@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.3.4/jasmine.min.css">
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.3.4/jasmine.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.3.4/jasmine-html.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.3.4/boot.min.js"></script>
+
+<!-- included files for testing -->
+<script src="../angular.js"></script>
+<script src="../ngmodules/angular-route.js"></script>
+<script src="../angular-mocks.js"></script>
+<script src="../app.js"></script>
+<script src="../filters/customFilters.js"></script>
+<script src="../controllers/trasactionHistoryController.js"></script>
+<script src="../controllers/conversionRateController.js"></script>
+<script src="../controllers/currencyConversionController.js"></script>
+
+<script type="text/javascript">
+describe("trasactionHistory Controller Test", function(){
+	
+	//Arrange
+	var mockScope, controller, backend, getDataUrl, getSymbolsUrl;
+
+	beforeEach(angular.mock.module("currencyConversionRates"));
+
+    beforeEach(angular.mock.inject(function ($httpBackend) {
+        backend = $httpBackend;
+        backend.expect("GET", "transactions.json").respond(
+	      [{ "date": "2014-01-10", "type": "purchase", "place": "Macys", 
+	      	"amount": 99.99, "currencyCode": "EUR" },
+	      { "date": "2014-01-02", "type": "purchase", "place": "Home Depot", 
+	      	"amount": 150.15, "currencyCode": "USD" },
+	      { "date": "2013-12-31", "type": "transfer", "place": "Wells Fargo", 
+	      	"amount": 99.99, "currencyCode": "CNY" }]);
+
+        backend.expect("GET", "/symbols").respond({
+	        "USD" : "$",
+	        "EUR" : "\u20AC", 
+	        "CAD" : "$",
+	        "CNY" : "\u5143",
+	        "INR" : "\u20B9",
+	        "MXN" : "$"
+        });        
+    }));
+
+	beforeEach(angular.mock.inject(function($controller, $rootScope, $http, dataUrl, symbolsUrl){
+		mockScope = $rootScope.$new();
+		getDataUrl = dataUrl;
+		getSymbolsUrl = symbolsUrl;
+		controller = $controller("trasactionHistoryCtrl", {
+			$scope: mockScope,
+			$http: $http
+		});
+		backend.flush();
+	}));
+
+	//Act and Assess
+	it("Initializes data", function(){
+		expect(mockScope.data).toBeDefined();		
+	});
+
+    it("Makes an Ajax request", function () {
+        backend.verifyNoOutstandingExpectation();
+    });
+
+	it("Processes transactions data", function(){
+		expect(mockScope.data.transactions).toBeDefined();
+		expect(mockScope.data.transactions.length).toEqual(3);
+		expect(mockScope.data.transactions[0].place).toEqual("Macys");
+	});
+
+	it("Processes currency symbols data", function(){
+		expect(mockScope.data.currencyCodes).toBeDefined();
+		expect(mockScope.data.currencyCodes.length).toEqual(6);
+		expect(mockScope.data.currencyCodes[3]).toEqual("CNY");
+		expect(mockScope.data.currencyCodes.indexOf("MXN")).toBeGreaterThan(-1);
+		expect(mockScope.data.currencyCodes.indexOf("GBP")).toEqual(-1);
+	});
+
+	it("Maps currency codes to symbols", function(){
+		expect(mockScope.currencySymbol("USD")).toEqual("$");
+		expect(mockScope.currencySymbol("CNY")).toEqual("\u5143");
+		expect(mockScope.currencySymbol("INR")).toEqual("\u20B9");
+		expect(mockScope.currencySymbol("GBP")).toEqual("$");
+	});
+});
+
+</script>
+</head>
+<body>
+</body>
+</html>
