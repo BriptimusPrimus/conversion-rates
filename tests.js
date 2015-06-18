@@ -8,7 +8,7 @@ function testCurrencyConversion(){
 	console.log("Test Currency Conversion Module:");
 	console.log(" ");
 
-	// initial setting in custom/mock mode
+	// initial setting in custom, mock mode
 	curConv.setConfiguration({
 	    source :"custom",
 	    mock: true,
@@ -47,7 +47,7 @@ function testCurrencyConversion(){
 	});	
 
 	function currencySymbols(){
-		console.log("Test getCurrencySymbols");
+		console.log("Gets currency code-symbols map");
 		curConv.getCurrencySymbols(function(err, symbols){
 			assert.strictEqual(err, null, "Executes without error");
 			assert.equal(symbols["USD"], "$", "American dollar symbol is $");
@@ -60,7 +60,7 @@ function testCurrencyConversion(){
 	}
 
 	function conversionRate(){
-		console.log("Test getConversionRate");
+		console.log("Gets Conversion Rates");
 		//empty currency code arguments
 		curConv.getConversionRate("", "", function(err, result){
 			assert.strictEqual(err, null, "Executes without error");
@@ -93,7 +93,7 @@ function testCurrencyConversion(){
 	}
 
 	function convertCurrency(){
-		console.log("Test convertFromAtoB");
+		console.log("Converts from one currency to another");
 		//empty currency code arguments
 		curConv.convertFromAtoB(100, "", "", function(err, result){
 			assert.strictEqual(err, null, "Executes without error");
@@ -136,7 +136,7 @@ function testLFileStorage(){
 	console.log(" ");
 
 	function getMap(){
-		console.log("Test getMap");
+		console.log("Retrieves currency rates map from local storage");
 		localStorage.getMap(function(err, map){
 			assert.strictEqual(err, null, "Executes without error");
 			assert.notEqual(map, null, "Finds currency rates map in local storage");
@@ -160,6 +160,7 @@ function testLFileStorage(){
 // 	console.log(" ");
 
 // 	function getMap(){
+//		console.log("Retrieves currency rates from public API");
 // 		//empty currency code arguments
 // 		publicApi.getMap("", "", function(err, map){
 // 			assert.strictEqual(err, null, "Executes without error");

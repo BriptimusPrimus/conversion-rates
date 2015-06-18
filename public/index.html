@@ -5,27 +5,7 @@
     <script src="angular.js"></script>
     <link href="bootstrap.css" rel="stylesheet" />
     <link href="bootstrap-theme.css" rel="stylesheet" />
-    <script>
-        angular.module("currencyConversionRates", ["customFilters", "ngRoute"])
-        .config(function ($routeProvider) {
-
-            $routeProvider.when("/activity", {
-                templateUrl: "views/activity.html"
-            });
-
-            $routeProvider.when("/currencyConversion", {
-                templateUrl: "views/currencyConversion.html"
-            });
-
-            $routeProvider.when("/conversionRate", {
-                templateUrl: "views/conversionRate.html"
-            });          
- 
-            $routeProvider.otherwise({
-                templateUrl: "views/activity.html"
-            });
-        });
-    </script>
+    <script src="app.js"></script>
     <script src="filters/customFilters.js"></script>
     <script src="controllers/trasactionHistoryController.js"></script>
     <script src="controllers/currencyConversionController.js"></script>

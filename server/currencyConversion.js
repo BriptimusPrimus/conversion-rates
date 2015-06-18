@@ -183,8 +183,8 @@ function computeConversionRate(convertFrom, convertTo, callback){
 
 		var result = (1/a.rate) * b.rate;
 		
-		//round to two decimals
-		result = Math.round(result * 100) / 100;
+		//fixed: do not round
+		// result = Math.round(result * 100) / 100;
 		callback(null, result);
 	}); 	
 }
@@ -200,8 +200,8 @@ function convertCurrency(amount, convertFrom, convertTo, callback){
 
 		var converted = amount * rate;
 		
-		//round to two decimals
-		converted = Math.round(converted * 100) / 100;
+		//fixed: do not round
+		// converted = Math.round(converted * 100) / 100;
 
 		//get the symbols
 		getSymbols(function(err, symbols){

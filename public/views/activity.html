@@ -17,7 +17,15 @@
 						<td class="text-center">{{item.date}}</td>
 						<td class="text-left">{{item.type | capitalize}}: {{item.place}}</td>
 						<td class="text-right">{{item.amount | currency:currencySymbol(item.currencyCode)}}</td>
-						<td class="text-center">{{item.currencyCode}}</td>
+						<td class="col-md-2 text-center" ng-click="selectItem(item)">
+							<span ng-hide="data.selectedItem == item">{{item.currencyCode}}</span>
+							<select class="form-control input-sm" ng-show="data.selectedItem == item" ng-model="item.currencyCode" ng-change="convertCurrency()">
+		                		<option ng-repeat="code in data.currencyCodes" ng-selected="code == item.currencyCode" value={{code}}>{{code}}{{currencySymbol(code)}}</option>
+							</select>
+							<div ng-show="showErrorMessage(item.id)">
+								<span class="text-danger">{{data.error.message}}</span>
+							</div>
+						</td>
 					</tr>
 				</tbody>
 			</table>

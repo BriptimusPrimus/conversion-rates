@@ -20,7 +20,6 @@ app.get('/symbols', function(req, res){
         if(err) 
             return res.status(500).end();
 
-        console.log(symbolsMap);
         res.json(symbolsMap);
     })
 });
@@ -33,7 +32,6 @@ app.get('/paypal/conversionRate', function(req, res){
             if(err) 
                 return res.status(500).end();
 
-            console.log("conversionRate:"+result);
             res.json({conversionRate: result});
         });
 });
@@ -47,7 +45,6 @@ app.get('/paypal/currencyConversion', function(req, res){
             if(err)
                 return res.status(500).end();
 
-            console.log(result);
             res.json(result);
         });   
 })

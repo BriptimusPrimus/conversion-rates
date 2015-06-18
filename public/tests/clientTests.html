@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.3.4/jasmine.min.css">
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.3.4/jasmine.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.3.4/jasmine-html.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.3.4/boot.min.js"></script>
+
+<!-- included files for testing -->
+<script src="../angular.js"></script>
+<script src="../ngmodules/angular-route.js"></script>
+<script src="../angular-mocks.js"></script>
+<script src="../app.js"></script>
+<script src="../filters/customFilters.js"></script>
+<script src="../controllers/trasactionHistoryController.js"></script>
+<script src="../controllers/conversionRateController.js"></script>
+<script src="../controllers/currencyConversionController.js"></script>
+
+<script type="text/javascript">
+describe("trasactionHistory Controller Tests", function(){
+	
+	//Arrange
+	var mockScope, controller, backend;
+
+	beforeEach(angular.mock.module("currencyConversionRates"));
+
+    beforeEach(angular.mock.inject(function ($httpBackend) {
+        backend = $httpBackend;
+        backend.expect("GET", "transactions.json").respond(
+	      [{ "date": "2014-01-10", "type": "purchase", "place": "Macys", 
+	      	"amount": 99.99, "currencyCode": "EUR" },
+	      { "date": "2014-01-02", "type": "purchase", "place": "Home Depot", 
+	      	"amount": 150.15, "currencyCode": "USD" },
+	      { "date": "2013-12-31", "type": "transfer", "place": "Wells Fargo", 
+	      	"amount": 99.99, "currencyCode": "CNY" }]);
+
+        backend.expect("GET", "/symbols").respond({
+	        "USD" : "$",
+	        "EUR" : "\u20AC", 
+	        "CAD" : "$",
+	        "CNY" : "\u5143",
+	        "INR" : "\u20B9",
+	        "MXN" : "$"
+        });        
+    }));
+
+	beforeEach(angular.mock.inject(function($controller, $rootScope, $http){
+		mockScope = $rootScope.$new();
+		controller = $controller("trasactionHistoryCtrl", {
+			$scope: mockScope,
+			$http: $http
+		});
+		backend.flush();
+	}));
+
+	//Act and Assess
+	it("Initializes data", function(){
+		expect(mockScope.data).toBeDefined();		
+	});
+
+    it("Makes an Ajax request", function () {
+        backend.verifyNoOutstandingExpectation();
+    });
+
+	it("Processes transactions data", function(){
+		expect(mockScope.data.transactions).toBeDefined();
+		expect(mockScope.data.transactions.length).toEqual(3);
+		expect(mockScope.data.transactions[0].place).toEqual("Macys");
+	});
+
+	it("Processes currency symbols data", function(){
+		expect(mockScope.data.currencyCodes).toBeDefined();
+		expect(mockScope.data.currencyCodes.length).toEqual(6);
+		expect(mockScope.data.currencyCodes[3]).toEqual("CNY");
+		expect(mockScope.data.currencyCodes.indexOf("MXN")).toBeGreaterThan(-1);
+		expect(mockScope.data.currencyCodes.indexOf("GBP")).toEqual(-1);
+	});
+
+	it("Maps currency codes to symbols", function(){
+		expect(mockScope.currencySymbol("USD")).toEqual("$");
+		expect(mockScope.currencySymbol("CNY")).toEqual("\u5143");
+		expect(mockScope.currencySymbol("INR")).toEqual("\u20B9");
+		expect(mockScope.currencySymbol("GBP")).toEqual("$");
+	});
+});
+
+describe("conversionRates Controller Tests", function(){
+
+	//Arrange
+	var mockScope, controller, backend;
+
+	beforeEach(angular.mock.module("currencyConversionRates"));
+
+    beforeEach(angular.mock.inject(function ($httpBackend) {
+        backend = $httpBackend;        
+    }));
+
+	beforeEach(angular.mock.inject(function($controller, $rootScope, $http){
+		mockScope = $rootScope.$new();
+		controller = $controller("conversionRateCtrl", {
+			$scope: mockScope,
+			$http: $http
+		});		
+	})); 
+
+	//Act and Assess
+	it("Initializes model", function(){
+		expect(mockScope.model).toBeDefined();
+		expect(mockScope.model.rate).toEqual(0);
+	});
+
+	it("Gets conversion rate from the server", function(){
+        backend.expect("GET", "/paypal/conversionRate?convertFrom=USD&convertTo=CNY")
+        .respond({conversionRate: 5});		
+		mockScope.model.convertFrom = "USD";
+		mockScope.model.convertTo = "CNY";		
+		mockScope.getConversionRate();
+		backend.flush();		
+		expect(mockScope.model.rate).toEqual(5);	
+	});
+
+	it("Sets no error when receiving conversion rate", function(){
+        backend.expect("GET", "/paypal/conversionRate?convertFrom=EUR&convertTo=MXN")
+        .respond({conversionRate: 20});
+		mockScope.model.convertFrom = "EUR";
+		mockScope.model.convertTo = "MXN";		
+		mockScope.getConversionRate();
+		backend.flush();
+		expect(mockScope.model.error).toBeUndefined();
+		expect(mockScope.model.rate).toEqual(20);        		
+	});
+
+	it("Identifies error on server error respond", function(){
+        backend.expect("GET", "/paypal/conversionRate?convertFrom=USD&convertTo=EUR")
+        .respond(500, {status : 500, message : "server error"});
+		mockScope.model.convertFrom = "USD";
+		mockScope.model.convertTo = "EUR";		
+		mockScope.getConversionRate();
+		backend.flush();
+		expect(mockScope.model.rate).toEqual("Unable to find conversion rate");
+		expect(mockScope.model.error.status).toEqual(500);
+	});	      	
+});
+
+describe("currencyConversion Controller Tests", function(){
+
+	//Arrange
+	var mockScope, controller, backend;
+
+	beforeEach(angular.mock.module("currencyConversionRates"));
+
+    beforeEach(angular.mock.inject(function ($httpBackend) {
+        backend = $httpBackend;        
+    }));
+
+	beforeEach(angular.mock.inject(function($controller, $rootScope, $http){
+		mockScope = $rootScope.$new();
+		controller = $controller("currencyConversionCtrl", {
+			$scope: mockScope,
+			$http: $http
+		});		
+	})); 
+
+	//Act and Assess
+	it("Initializes model", function(){
+		expect(mockScope.model).toBeDefined();
+		expect(mockScope.model.convertedVal).toEqual(0);
+		expect(mockScope.model.amount).toEqual(1);
+	});
+
+	it("Gets converted currency data from the server", function(){
+        backend.expect("GET", "/paypal/currencyConversion?amount=10&convertFrom=USD&convertTo=CNY")
+        .respond({        	
+        	"convertedValue":50,
+        	"currencyCode":"CNY",
+        	"symbol":"元"
+        });
+        mockScope.model.amount = 10;
+		mockScope.model.convertFrom = "USD";
+		mockScope.model.convertTo = "CNY";		
+		mockScope.convertCurrency();
+		backend.flush();		
+		expect(mockScope.model.convertedVal).toEqual(50);	
+	});
+
+	it("Sets no error when receiving conversion rate", function(){
+        backend.expect("GET", "/paypal/currencyConversion?amount=10&convertFrom=EUR&convertTo=MXN")
+        .respond({        	
+        	"convertedValue":200,
+        	"currencyCode":"MXN",
+        	"symbol":"$"
+        });
+        mockScope.model.amount = 10;
+		mockScope.model.convertFrom = "EUR";
+		mockScope.model.convertTo = "MXN";		
+		mockScope.convertCurrency();
+		backend.flush();
+		expect(mockScope.model.error).toBeUndefined();
+		expect(mockScope.model.convertedVal).toEqual(200);        		
+	});	
+
+	it("Identifies error on server error respond", function(){
+        backend.expect("GET", "/paypal/currencyConversion?amount=10&convertFrom=USD&convertTo=EUR")
+        .respond(500, {status : 500, message : "server error"});
+		mockScope.model.amount = 10;
+		mockScope.model.convertFrom = "USD";
+		mockScope.model.convertTo = "EUR";		
+		mockScope.convertCurrency();
+		backend.flush();
+		expect(mockScope.model.convertedVal).toEqual("Unable to find conversion rate");
+		expect(mockScope.model.error.status).toEqual(500);
+	});		      	
+});
+
+describe("Capitalize Filter Tests", function () {
+ 
+    var filterInstance;
+ 
+    beforeEach(angular.mock.module("customFilters"));
+ 
+    beforeEach(angular.mock.inject(function ($filter) {
+        filterInstance = $filter("capitalize");
+    }));
+ 
+    it("Capitalizes a lower case frase", function () {
+        var result = filterInstance("test phrase");
+        expect(result).toEqual("Test phrase");
+    });
+ 
+    it("Capitalizes only first letter in an upper cased frase", function () {
+        var result = filterInstance("TEST PHRASE", true);
+        expect(result).toEqual("Test phrase");
+    });
+});
+
+</script>
+</head>
+<body>
+</body>
+</html>

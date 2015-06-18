@@ -6,7 +6,6 @@ angular.module("currencyConversionRates")
 		$scope.model.amount = 1;
 
 		$scope.convertCurrency = function(){
-			$scope.model.amount = $scope.model.amount;
 			$scope.model.convertFrom = $scope.model.convertFrom || "";
 			$scope.model.convertTo = $scope.model.convertTo || "";	
 
