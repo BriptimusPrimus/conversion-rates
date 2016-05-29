@@ -1,9 +1,10 @@
 {
-  "name" : "ServeStaticContent",
+  "name": "ServeStaticContent",
   "description": "Simple Currency Conversion App",
-  "version" : "0.0.1",
+  "version": "0.0.1",
   "main": "server.js",
-  "dependencies" : {
-    "express" : "4.10.2"
+  "dependencies": {
+    "cookie-parser": "^1.4.3",
+    "express": "4.10.2"
   }
 }
