@@ -18,12 +18,27 @@ app.use(express.static(__dirname + '/public'));
 
 // Allow CORS
 app.use(function(req, res, next) {
+  console.log('Hi Cross Domain', req.headers);
   // res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Origin", "http://localhost:8080");
+  // res.header("Access-Control-Allow-Origin", "http://localhost.paypal.com:3000");
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.header("Access-Control-Allow-Credentials: true");
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
+});
+
+// /start hackathon mock endpoint
+app.get('/start', function(req, res) {
+  console.log('');console.log('');
+  console.log('*******************************');console.log('*******************************');
+  console.log('This is U2F client start endpoint (simulated)');
+  console.log('sec_context:', req.cookies['x-factor']);
+  console.log('*******************************');console.log('*******************************');
+  console.log('');console.log('');
+  res.send('<html><body><p>This is U2F client app</p><p>' +
+    'sec_context:' + JSON.stringify(req.cookies['x-factor']) +
+    '</p></body></html>');
 });
 
 // /symbols
@@ -64,7 +79,7 @@ app.get('/paypal/currencyConversion', function(req, res){
 })
 
 
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 8443;
 app.listen(port, function(){
 	console.log("Server App listening on port ", port);
 });
